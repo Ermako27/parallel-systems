@@ -6,17 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/ermak/parallel-systems/main.c
+/home/ermak/parallel-systems/matrix.c
 stdio.h
 -
 stdlib.h
 -
 string.h
--
-matrix.h
-/home/ermak/parallel-systems/matrix.h
-
-/home/ermak/parallel-systems/matrix.h
-stdio.h
 -
 

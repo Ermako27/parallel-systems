@@ -17,9 +17,17 @@ int main(void) {
     print_matrix(matrix, n, m);
 
 
-    reduce_columns(matrix, n, m);
-    printf("\n\n");
-    reduce_rows(matrix, n, m);
+    int** reduced_rows_matrix;
+    reduced_rows_matrix = reduce_rows(matrix, n, m);
+    printf("\nreduced_rows_matrix \n");
+    print_matrix(reduced_rows_matrix, n, m);
+
+    printf("\n");
+
+    int** reduced_columns_matrix;
+    reduced_columns_matrix = reduce_columns(reduced_rows_matrix, n, m);
+    printf("\nreduced_columns_matrix \n");
+    print_matrix(reduced_columns_matrix, n, m);
 
     return 0;
 }
