@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ermak/parallel-systems/main.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+matrix.h
+/home/ermak/parallel-systems/matrix.h
+
+/home/ermak/parallel-systems/matrix.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+
+/home/ermak/parallel-systems/matrix.h
+stdio.h
+-
+

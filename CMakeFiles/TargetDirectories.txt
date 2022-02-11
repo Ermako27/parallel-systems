@@ -1,0 +1,3 @@
+/home/ermak/parallel-systems/CMakeFiles/rebuild_cache.dir
+/home/ermak/parallel-systems/CMakeFiles/edit_cache.dir
+/home/ermak/parallel-systems/CMakeFiles/lab01.dir
