@@ -5,4 +5,5 @@ CMakeFiles/lab01.dir/main.c.o: main.c
 CMakeFiles/lab01.dir/main.c.o: matrix.h
 
 CMakeFiles/lab01.dir/matrix.c.o: matrix.c
+CMakeFiles/lab01.dir/matrix.c.o: matrix.h
 
