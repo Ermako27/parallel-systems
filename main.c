@@ -7,46 +7,42 @@ int main(void) {
     FILE *fp;
     char fileName[] = "test1.txt";
     char ch;
-    int n;
-    int m;
-    int** matrix;
+    matrix_t matrix;
 
     fp = fopen(fileName, "r");
 
-    matrix_size_t size;
-    matrix = create_matrix(fp, &n, &m);
-    size.n = n;
-    size.m = m;
-    print_matrix(matrix, size);
+    matrix = create_matrix(fp);
+    print_matrix(matrix);
 
 
     // редукция строк
-    int** reduced_rows_matrix;
-    reduced_rows_matrix = reduce_rows(matrix, size);
+    matrix_t reduced_rows_matrix;
+    reduced_rows_matrix = reduce_rows(matrix);
     printf("\nreduced_rows_matrix \n");
-    print_matrix(reduced_rows_matrix, size);
+    print_matrix(reduced_rows_matrix);
 
     printf("\n");
 
     // редукция столбцов
-    int** reduced_columns_matrix;
-    reduced_columns_matrix = reduce_columns(reduced_rows_matrix, size);
+    matrix_t reduced_columns_matrix;
+    reduced_columns_matrix = reduce_columns(reduced_rows_matrix);
     printf("\nreduced_columns_matrix \n");
-    print_matrix(reduced_columns_matrix, size);
+    print_matrix(reduced_columns_matrix);
 
     printf("\n");
 
     // поиск позиции нуля с наибольшоей оценкой и вычисление самой оценки
     max_zero_estimate_t estimate;
-    estimate = find_max_zero_estimate(reduced_columns_matrix, size);
+    estimate = find_max_zero_estimate(reduced_columns_matrix);
     printf("estimate: %d, i: %d, j: %d", estimate.estimate, estimate.pos.i, estimate.pos.j);
 
-    printf("\n");
+    printf("\nasdf");
 
     // удаление строки и столбца где содержится 0 с максимальной оценкой
     matrix_t reduced_matrix;
-    reduced_matrix = reduce_matrix(reduced_columns_matrix, size, estimate.pos);
-    print_matrix(reduced_matrix.data, reduced_matrix.size);
+    reduced_matrix = reduce_matrix(reduced_columns_matrix, estimate.pos);
+    print_matrix(reduced_matrix);
+    printf("\nasdf");
 
     return 0;
 }

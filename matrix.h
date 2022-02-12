@@ -8,8 +8,14 @@ typedef struct matrix_size {
     int m;
 } matrix_size_t;
 
+typedef struct matrix_el {
+    int weight;
+    int start;
+    int end;
+} matrix_el_t;
+
 typedef struct matrix {
-    int** data;
+    matrix_el_t** data;
     matrix_size_t size;
 } matrix_t;
 
@@ -25,22 +31,26 @@ typedef struct max_zero_estimate {
 
 void print_string(char *str);
 
-void print_matrix(int** matrix, matrix_size_t size);
+void print_matrix(matrix_t matrix);
 
-int** allocate_matrix(matrix_size_t size);
+matrix_el_t** allocate_matrix(matrix_size_t size);
 
-int** create_matrix(FILE* fp, int *size_n, int *size_m);
+matrix_t create_matrix(FILE *fp);
 
-int find_column_min(int** matrix, int n, int column);
+int find_column_min(matrix_t matrix, int n, int column);
 
-int find_row_min(int** matrix, int row, int m);
+int find_row_min(matrix_t matrix, int row, int m);
 
-int** reduce_columns(int** matrix, matrix_size_t size);
+matrix_t reduce_columns(matrix_t matrix);
 
-int** reduce_rows(int** matrix, matrix_size_t size);
+matrix_t reduce_rows(matrix_t matrix);
 
-max_zero_estimate_t find_max_zero_estimate(int** matrix, matrix_size_t size);
+int find_row_min_for_estimate(matrix_t matrix, int row, int m, int column);
 
-matrix_t reduce_matrix(int** matrix, matrix_size_t old_size, pos_t pos);
+int find_column_min_for_estimate(matrix_t matrix, int n, int column, int row);
+
+max_zero_estimate_t find_max_zero_estimate(matrix_t matrix);
+
+matrix_t reduce_matrix(matrix_t matrix, pos_t pos);
 
 #endif
