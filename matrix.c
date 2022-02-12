@@ -83,14 +83,18 @@ int find_column_min(matrix_t matrix, int n, int column) {
     return result;
 }
 
-matrix_t reduce_columns(matrix_t matrix) {
+reduced_cols_matrix_t reduce_columns(matrix_t matrix) {
+    reduced_cols_matrix_t result;
     matrix_t new_matrix;
     int column_min;
+    int sum_column_min = 0;
+
     matrix_el_t** reduced_columns_matrix = allocate_matrix(matrix.size);
 
     // идем по столбцам и находим минимальный элемент в каждом столбце
     for (int j = 0; j < matrix.size.m; j++) {
         column_min = find_column_min(matrix, matrix.size.n, j);
+        sum_column_min += column_min;
         // printf("column %d min: %d \n", j, column_min);
 
         for (int i = 0; i < matrix.size.n; i++) {
@@ -104,7 +108,10 @@ matrix_t reduce_columns(matrix_t matrix) {
 
     new_matrix.data = reduced_columns_matrix;
     new_matrix.size = matrix.size;
-    return new_matrix;
+
+    result.matrix = new_matrix;
+    result.sum_column_min = sum_column_min;
+    return result;
 }
 
 int find_row_min(matrix_t matrix, int row, int m) {
@@ -120,13 +127,17 @@ int find_row_min(matrix_t matrix, int row, int m) {
     return result;
 }
 
-matrix_t reduce_rows(matrix_t matrix) {
+reduced_rows_matrix_t reduce_rows(matrix_t matrix) {
+    reduced_rows_matrix_t result;
     matrix_t new_matrix;
     int row_min;
+    int sum_row_min = 0;
+
     matrix_el_t** reduced_rows_matrix = allocate_matrix(matrix.size);
     // идем по строкам и находим минимальный элемент в каждой строке
     for (int i = 0; i < matrix.size.n; i++) {
         row_min = find_row_min(matrix, i, matrix.size.m);
+        sum_row_min += row_min;
         // printf("row %d min: %d \n", i, row_min);
 
         for (int j = 0; j < matrix.size.m; j++) {
@@ -140,7 +151,10 @@ matrix_t reduce_rows(matrix_t matrix) {
 
     new_matrix.data = reduced_rows_matrix;
     new_matrix.size = matrix.size;
-    return new_matrix;
+
+    result.matrix = new_matrix;
+    result.sum_rows_min = sum_row_min;
+    return result;
 }
 
 int find_row_min_for_estimate(matrix_t matrix, int row, int m, int column) {

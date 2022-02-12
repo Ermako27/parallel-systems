@@ -177,6 +177,33 @@ matrix.c.s:
 	$(MAKE) -f CMakeFiles/lab01.dir/build.make CMakeFiles/lab01.dir/matrix.c.s
 .PHONY : matrix.c.s
 
+tree.o: tree.c.o
+
+.PHONY : tree.o
+
+# target to build an object file
+tree.c.o:
+	$(MAKE) -f CMakeFiles/lab01.dir/build.make CMakeFiles/lab01.dir/tree.c.o
+.PHONY : tree.c.o
+
+tree.i: tree.c.i
+
+.PHONY : tree.i
+
+# target to preprocess a source file
+tree.c.i:
+	$(MAKE) -f CMakeFiles/lab01.dir/build.make CMakeFiles/lab01.dir/tree.c.i
+.PHONY : tree.c.i
+
+tree.s: tree.c.s
+
+.PHONY : tree.s
+
+# target to generate assembly for a file
+tree.c.s:
+	$(MAKE) -f CMakeFiles/lab01.dir/build.make CMakeFiles/lab01.dir/tree.c.s
+.PHONY : tree.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -192,6 +219,9 @@ help:
 	@echo "... matrix.o"
 	@echo "... matrix.i"
 	@echo "... matrix.s"
+	@echo "... tree.o"
+	@echo "... tree.i"
+	@echo "... tree.s"
 .PHONY : help
 
 

@@ -1,1 +1,1 @@
-mpicc    CMakeFiles/lab01.dir/main.c.o CMakeFiles/lab01.dir/matrix.c.o  -o lab01 
+mpicc    CMakeFiles/lab01.dir/main.c.o CMakeFiles/lab01.dir/matrix.c.o CMakeFiles/lab01.dir/tree.c.o  -o lab01 

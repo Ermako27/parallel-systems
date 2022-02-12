@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_C
   "/home/ermak/parallel-systems/main.c" "/home/ermak/parallel-systems/CMakeFiles/lab01.dir/main.c.o"
   "/home/ermak/parallel-systems/matrix.c" "/home/ermak/parallel-systems/CMakeFiles/lab01.dir/matrix.c.o"
+  "/home/ermak/parallel-systems/tree.c" "/home/ermak/parallel-systems/CMakeFiles/lab01.dir/tree.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

@@ -19,6 +19,16 @@ typedef struct matrix {
     matrix_size_t size;
 } matrix_t;
 
+typedef struct reduced_cols_matrix {
+    matrix_t matrix;
+    int sum_column_min;
+} reduced_cols_matrix_t;
+
+typedef struct reduced_rows_matrix {
+    matrix_t matrix;
+    int sum_rows_min;
+} reduced_rows_matrix_t;
+
 typedef struct pos {
     int i;
     int j;
@@ -41,9 +51,9 @@ int find_column_min(matrix_t matrix, int n, int column);
 
 int find_row_min(matrix_t matrix, int row, int m);
 
-matrix_t reduce_columns(matrix_t matrix);
+reduced_cols_matrix_t reduce_columns(matrix_t matrix);
 
-matrix_t reduce_rows(matrix_t matrix);
+reduced_rows_matrix_t reduce_rows(matrix_t matrix);
 
 int find_row_min_for_estimate(matrix_t matrix, int row, int m, int column);
 

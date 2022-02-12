@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/lab01.dir/main.c.o"
   "CMakeFiles/lab01.dir/matrix.c.o"
+  "CMakeFiles/lab01.dir/tree.c.o"
   "lab01"
   "lab01.pdb"
 )
