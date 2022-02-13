@@ -47,6 +47,8 @@ void print_matrix(matrix_t matrix);
 
 matrix_el_t** allocate_matrix(matrix_size_t size);
 
+matrix_t copy_matrix(matrix_t matrix_to_copy);
+
 matrix_t create_matrix(FILE *fp);
 
 int find_column_min(matrix_t matrix, int n, int column);

@@ -38,6 +38,29 @@ matrix_el_t** allocate_matrix(matrix_size_t size) {
     return matrix;
 }
 
+matrix_t copy_matrix(matrix_t matrix_to_copy) {
+    matrix_t result;
+    matrix_el_t** matrix;
+
+    matrix = allocate_matrix(matrix_to_copy.size);
+
+    for (int i = 0; i < matrix_to_copy.size.n; i++) {
+        for (int j = 0; j < matrix_to_copy.size.m; j++) {
+            matrix[i][j].start = matrix_to_copy.data[i][j].start;
+            matrix[i][j].end = matrix_to_copy.data[i][j].end;
+            matrix[i][j].weight = matrix_to_copy.data[i][j].weight;
+
+        }
+    }
+
+    result.data = matrix;
+    result.size.n = matrix_to_copy.size.n;
+    result.size.m = matrix_to_copy.size.m;
+
+    return result;
+}
+
+
 matrix_t create_matrix(FILE *fp) {
     matrix_t matrix;
     char ch;
