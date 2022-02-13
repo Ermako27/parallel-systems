@@ -6,23 +6,17 @@
 
 #IncludeRegexTransform: 
 
-/home/ermak/parallel-systems/matrix.h
-stdio.h
--
-
-/home/ermak/parallel-systems/tree.c
+/home/ermak/parallel-systems/matrix.c
 stdio.h
 -
 stdlib.h
 -
-matrix.h
-/home/ermak/parallel-systems/matrix.h
-tree.h
-/home/ermak/parallel-systems/tree.h
-
-/home/ermak/parallel-systems/tree.h
-stdio.h
+string.h
 -
 matrix.h
 /home/ermak/parallel-systems/matrix.h
+
+/home/ermak/parallel-systems/matrix.h
+stdio.h
+-
 

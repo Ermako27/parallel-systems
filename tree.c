@@ -14,7 +14,6 @@ void print_node(Node* node) {
 Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, Node* left, Node* right) {
     Node* node = (Node*) malloc(sizeof(Node));
     node->matrix = copy_matrix(matrix);
-
     node->estimate.pos.i = -1;
     node->estimate.pos.j = -1;
     node->estimate.value = -1;
@@ -30,18 +29,11 @@ void calc_root_border(Node *root) {
     int border; 
     reduced_rows_matrix_t reduced_rows_matrix;
     reduced_rows_matrix = reduce_rows(root->matrix);
-    printf("\nreduced_rows_matrix \n");
-    print_matrix(reduced_rows_matrix.matrix);
-    printf("sum of min element in every row %d\n\n", reduced_rows_matrix.sum_rows_min);
 
     reduced_cols_matrix_t reduced_columns_matrix;
     reduced_columns_matrix = reduce_columns(reduced_rows_matrix.matrix);
-    printf("\nreduced_columns_matrix \n");
-    print_matrix(reduced_columns_matrix.matrix);
-    printf("sum of min element in every column %d\n", reduced_columns_matrix.sum_column_min);
 
     border = reduced_rows_matrix.sum_rows_min + reduced_columns_matrix.sum_column_min;
-    printf("\nroot border: %d \n\n", border);
 
     root->border = border;
     root->matrix = reduced_columns_matrix.matrix;
@@ -112,16 +104,25 @@ void split_leaves(Node* node) {
         create_right_include(node);
     } else {
         // 1 считаем редукцию строк матрицы в node
+        reduced_rows_matrix_t reduced_rows_matrix;
+        reduced_rows_matrix = reduce_rows(node->matrix);
 
 
         // 2 считаем редукцию столбцов матрицы в node
+        reduced_cols_matrix_t reduced_columns_matrix;
+        reduced_columns_matrix = reduce_columns(reduced_rows_matrix.matrix);
 
+        // сохраняем преобразованную матрицу в ноду 
+        node->matrix = copy_matrix(reduced_columns_matrix.matrix);
 
-        // 3 считаем оценку нулей и находим ноль с наибольшей оценкой
+        // 4 считаем оценку нулей и находим ноль с наибольшей оценкой
         // выставляем эту оценку ноде, которая будет являться
         // родительской для нод, которые будут создаваться ниже
+        estimate = find_max_zero_estimate(node->matrix);
+        node->estimate = estimate;
 
-        // матрицу полученную в результате 1 и 2 сетим в node
+        create_left_exclude(node);
+        create_right_include(node);
     }
 }
 
@@ -134,12 +135,24 @@ void create_tree(FILE *fp) {
 
     // создаем корень, считаем его границу и выставляем нужную матрицу
     root = create_node(matrix, 0, 1, NULL, NULL, NULL);
-    calc_root_border(root); 
+    calc_root_border(root);
 
     // сплитим корень на две другие ноды
     split_leaves(root);
 
+    printf("\n~~~~~~~LAYER 0~~~~~~~\n");
     print_node(root);
+    printf("\n\n~~~~~~~LAYER 1~~~~~~~\n");
     print_node(root->left_exclude);
     print_node(root->right_include);
+
+    // сплитим второй уровень слева
+    split_leaves(root->left_exclude);
+    split_leaves(root->right_include);
+    
+    printf("\n\n~~~~~~~LAYER 2~~~~~~~\n");
+    print_node(root->left_exclude->left_exclude);
+    print_node(root->left_exclude->right_include);
+    print_node(root->right_include->left_exclude);
+    print_node(root->right_include->right_include);
 }

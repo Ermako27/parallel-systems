@@ -20,6 +20,15 @@ void print_matrix(matrix_t matrix) {
     }
 }
 
+void print_matrix_ways(matrix_t matrix) {
+    for (int i = 0; i < matrix.size.n; i++) {
+        for (int j = 0; j < matrix.size.m; j++) {
+            printf("%d-%d ", matrix.data[i][j].start, matrix.data[i][j].end);
+        }
+        printf("\n");
+    }
+}
+
 matrix_el_t** allocate_matrix(matrix_size_t size) {
     matrix_el_t **matrix = calloc(size.n, sizeof(matrix_el_t*));
 
@@ -124,6 +133,17 @@ reduced_cols_matrix_t reduce_columns(matrix_t matrix) {
             } else {
                 reduced_columns_matrix[i][j].weight = matrix.data[i][j].weight - column_min;
             }
+
+            reduced_columns_matrix[i][j].start = matrix.data[i][j].start;
+            reduced_columns_matrix[i][j].end = matrix.data[i][j].end;
+        }
+    }
+
+    // в каждую ячейку матрицы устанавливаем откуда куда это путь
+    for (int i = 0; i < matrix.size.n; i++) {
+        for (int j = 0; j < matrix.size.m; j++) {
+            reduced_columns_matrix[i][j].start = matrix.data[i][j].start;
+            reduced_columns_matrix[i][j].end = matrix.data[i][j].end;
         }
     }
 
@@ -167,6 +187,10 @@ reduced_rows_matrix_t reduce_rows(matrix_t matrix) {
             } else {
                 reduced_rows_matrix[i][j].weight = matrix.data[i][j].weight - row_min;
             }
+
+            // в каждую ячейку матрицы устанавливаем откуда куда это путь
+            reduced_rows_matrix[i][j].start = matrix.data[i][j].start;
+            reduced_rows_matrix[i][j].end = matrix.data[i][j].end;
         }
     }
 
@@ -234,13 +258,39 @@ max_zero_estimate_t find_max_zero_estimate(matrix_t matrix) {
         }
     }
 
-    printf("estimate: %d, i: %d, j: %d", zero_estimate.value, zero_estimate.pos.i, zero_estimate.pos.j);
+    printf("\nestimate: %d, i: %d, j: %d", zero_estimate.value, zero_estimate.pos.i, zero_estimate.pos.j);
     return zero_estimate;
+}
+
+pos_t find_way_back(matrix_t matrix, pos_t estimate_position) {
+    pos_t result;
+    int stop = 0;
+    int way_back_start = matrix.data[estimate_position.i][estimate_position.j].end;
+    int way_back_end = matrix.data[estimate_position.i][estimate_position.j].start;
+    int value = matrix.data[estimate_position.i][estimate_position.j].weight;
+
+    for (int i = 0; i < matrix.size.n; i++) {
+        for (int j = 0; j < matrix.size.m; j++) {
+            if (matrix.data[i][j].start == way_back_start && matrix.data[i][j].end == way_back_end) {
+                result.i = i;
+                result.j = j;
+                stop = 1;
+                break;
+            }     
+        }
+
+        if (stop == 1) {
+            break;
+        }
+    }
+
+    return result;
 }
 
 matrix_t reduce_matrix(matrix_t matrix, pos_t pos) {
     matrix_t result;
     matrix_size_t new_size;
+    pos_t way_back_position;
     new_size.n = matrix.size.n - 1;
     new_size.m = matrix.size.m - 1;
 
@@ -250,7 +300,8 @@ matrix_t reduce_matrix(matrix_t matrix, pos_t pos) {
     matrix_el_t** new_matrix_data = allocate_matrix(new_size);
 
     // при удалении строки и столбца из матрицы ставим на обратный путь значек INF
-    matrix.data[pos.j][pos.i].weight = INF;
+    way_back_position = find_way_back(matrix, pos);
+    matrix.data[way_back_position.i][way_back_position.j].weight = INF;
 
     // проходимся по элементам старрый матрицы
     for (int i = 0; i < matrix.size.n; i++) {

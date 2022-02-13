@@ -45,6 +45,8 @@ void print_string(char *str);
 
 void print_matrix(matrix_t matrix);
 
+void print_matrix_ways(matrix_t matrix);
+
 matrix_el_t** allocate_matrix(matrix_size_t size);
 
 matrix_t copy_matrix(matrix_t matrix_to_copy);
