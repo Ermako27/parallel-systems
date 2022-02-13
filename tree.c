@@ -126,9 +126,38 @@ void split_leaves(Node* node) {
     }
 }
 
+int is_leaf(Node* node) {
+    if (node->left_exclude == NULL && node->right_include == NULL) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+Node* find_node_with_min_border(Node* node) {
+    Node* left_node;
+    Node* right_node;
+    int is_node_leaf;
+    is_node_leaf = is_leaf(node);
+
+    if (is_node_leaf == 1) {
+        return node;
+    } else {
+        left_node = find_node_with_min_border(node->left_exclude);
+        right_node = find_node_with_min_border(node->right_include);
+
+        if (left_node->border < right_node->border) {
+            return left_node;
+        } else {
+            return right_node;
+        }
+    }
+}
+
 void create_tree(FILE *fp) {
     matrix_t matrix;
     Node* root;
+    Node* node_with_min_border;
 
     // считаем матрицу
     matrix = create_matrix(fp);
@@ -155,4 +184,8 @@ void create_tree(FILE *fp) {
     print_node(root->left_exclude->right_include);
     print_node(root->right_include->left_exclude);
     print_node(root->right_include->right_include);
+
+    node_with_min_border = find_node_with_min_border(root);
+    printf("\n\n~~~~~~~node with min border~~~~~~~\n");
+    print_node(node_with_min_border);
 }
