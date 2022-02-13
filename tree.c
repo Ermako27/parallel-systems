@@ -12,7 +12,7 @@ void print_node(Node* node) {
 }
 
 Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, Node* left, Node* right) {
-    Node* node;
+    Node* node = (Node*) malloc(sizeof(Node));
     node->matrix = matrix;
 
     printf("\n!4!\n");
@@ -144,17 +144,21 @@ void split_leaves(Node* node) {
 void create_tree(FILE *fp) {
     matrix_t matrix;
     Node* root;
+    Node* root2;
 
     // считаем матрицу
     matrix = create_matrix(fp);
 
     // создаем корень, считаем его границу и выставляем нужную матрицу
     root = create_node(matrix, 0, 1, NULL, NULL, NULL);
+    root2 = create_node(matrix, 0, 1, NULL, NULL, NULL);
     calc_root_border(root);
     print_node(root);
+    print_node(root2);
+    
 
     
 
     // сплитим корень на две другие ноды
-    split_leaves(root);
+    // split_leaves(root);
 }
