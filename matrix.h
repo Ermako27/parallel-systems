@@ -3,6 +3,8 @@
 #ifndef __MATRIX__H__
 #define __MATRIX__H__
 
+#define INF 9999
+
 typedef struct matrix_size {
     int n;
     int m;
@@ -36,7 +38,7 @@ typedef struct pos {
 
 typedef struct max_zero_estimate {
     pos_t pos;
-    int estimate;
+    int value;
 } max_zero_estimate_t;
 
 void print_string(char *str);

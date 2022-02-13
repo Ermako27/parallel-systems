@@ -6,10 +6,11 @@
 
 typedef struct Node {
     matrix_t matrix;
+    max_zero_estimate_t estimate;
     int border;
     int is_included;
     struct Node *right_include;
-    struct Node *left_not_include;
+    struct Node *left_exclude;
     struct Node *parent;
 } Node;
 

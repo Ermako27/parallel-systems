@@ -37,7 +37,7 @@ int main(void) {
     // // поиск позиции нуля с наибольшоей оценкой и вычисление самой оценки
     // max_zero_estimate_t estimate;
     // estimate = find_max_zero_estimate(reduced_columns_matrix.matrix);
-    // printf("estimate: %d, i: %d, j: %d", estimate.estimate, estimate.pos.i, estimate.pos.j);
+    // printf("estimate: %d, i: %d, j: %d", estimate.value, estimate.pos.i, estimate.pos.j);
 
     // printf("\n");
 

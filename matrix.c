@@ -3,8 +3,6 @@
 #include <string.h>
 #include "matrix.h"
 
-#define INF 9999
-
 void print_string(char *str) {
     int len = strlen(str);
 
@@ -189,7 +187,7 @@ max_zero_estimate_t find_max_zero_estimate(matrix_t matrix) {
     int estimate;
 
     max_zero_estimate_t zero_estimate;
-    zero_estimate.estimate = -1;
+    zero_estimate.value = -1;
     zero_estimate.pos.i = -1;
     zero_estimate.pos.j = -1;
 
@@ -204,8 +202,8 @@ max_zero_estimate_t find_max_zero_estimate(matrix_t matrix) {
 
                 // printf("\n--------\n\n");
                 estimate = min_row + min_column;
-                if (zero_estimate.estimate == -1 || zero_estimate.estimate < estimate) { 
-                    zero_estimate.estimate = estimate;
+                if (zero_estimate.value == -1 || zero_estimate.value < estimate) { 
+                    zero_estimate.value = estimate;
                     zero_estimate.pos.i = i;
                     zero_estimate.pos.j = j;
                 }
@@ -213,6 +211,7 @@ max_zero_estimate_t find_max_zero_estimate(matrix_t matrix) {
         }
     }
 
+    printf("estimate: %d, i: %d, j: %d", zero_estimate.value, zero_estimate.pos.i, zero_estimate.pos.j);
     return zero_estimate;
 }
 
@@ -227,6 +226,7 @@ matrix_t reduce_matrix(matrix_t matrix, pos_t pos) {
 
     matrix_el_t** new_matrix_data = allocate_matrix(new_size);
 
+    // при удалении строки и столбца из матрицы ставим на обратный путь значек INF
     matrix.data[pos.j][pos.i].weight = INF;
 
     // проходимся по элементам старрый матрицы
