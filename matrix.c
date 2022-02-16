@@ -29,6 +29,14 @@ void print_matrix_ways(matrix_t matrix) {
     }
 }
 
+int is_one_element_matrix(matrix_t matrix) {
+    if (matrix.size.n == 1 && matrix.size.m == 1) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 matrix_el_t** allocate_matrix(matrix_size_t size) {
     matrix_el_t **matrix = calloc(size.n, sizeof(matrix_el_t*));
 
@@ -264,7 +272,11 @@ max_zero_estimate_t find_max_zero_estimate(matrix_t matrix) {
 
 pos_t find_way_back(matrix_t matrix, pos_t estimate_position) {
     pos_t result;
+    result.i = -1;
+    result.j = -1;
+
     int stop = 0;
+
     int way_back_start = matrix.data[estimate_position.i][estimate_position.j].end;
     int way_back_end = matrix.data[estimate_position.i][estimate_position.j].start;
     int value = matrix.data[estimate_position.i][estimate_position.j].weight;
@@ -301,7 +313,11 @@ matrix_t reduce_matrix(matrix_t matrix, pos_t pos) {
 
     // при удалении строки и столбца из матрицы ставим на обратный путь значек INF
     way_back_position = find_way_back(matrix, pos);
-    matrix.data[way_back_position.i][way_back_position.j].weight = INF;
+    printf("\n way_back_position: i: %d, j: %d", way_back_position.i, way_back_position.j);
+
+    if (way_back_position.i != -1 && way_back_position.j != -1) {
+        matrix.data[way_back_position.i][way_back_position.j].weight = INF;
+    }
 
     // проходимся по элементам старрый матрицы
     for (int i = 0; i < matrix.size.n; i++) {

@@ -5,10 +5,14 @@
 
 void print_node(Node* node) {
     printf("\n--------NODE-------\n");
-    print_matrix(node->matrix);
-    printf("\nborder: %d", node->border);
-    printf("\nis_included: %d", node->is_included);
-    printf("\n--------END NODE-------\n");
+    if (node == NULL) {
+        printf("NULL LEAF");
+    } else {
+        print_matrix(node->matrix);
+        printf("\nborder: %d", node->border);
+        printf("\nis_included: %d", node->is_included);
+    }
+    printf("\n-----END NODE------\n");
 }
 
 Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, Node* left, Node* right) {
@@ -158,6 +162,7 @@ void create_tree(FILE *fp) {
     matrix_t matrix;
     Node* root;
     Node* node_with_min_border;
+    int is_one_element_left = 0;
 
     // считаем матрицу
     matrix = create_matrix(fp);
@@ -166,18 +171,24 @@ void create_tree(FILE *fp) {
     root = create_node(matrix, 0, 1, NULL, NULL, NULL);
     calc_root_border(root);
 
-    // сплитим корень на две другие ноды
-    split_leaves(root);
+    // чтобы начать цикл находим ноду с наименьшей границей (на данный момент это root) и проверяем кол-во элементов в ее матрице
+    node_with_min_border = find_node_with_min_border(root);
+    is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+
+    while (is_one_element_left == 0) {
+        split_leaves(node_with_min_border);
+        node_with_min_border = find_node_with_min_border(root);
+        is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+        printf("\n is_one_element_left: %d", is_one_element_left);
+    }
+
 
     printf("\n~~~~~~~LAYER 0~~~~~~~\n");
     print_node(root);
+
     printf("\n\n~~~~~~~LAYER 1~~~~~~~\n");
     print_node(root->left_exclude);
     print_node(root->right_include);
-
-    // сплитим второй уровень слева
-    split_leaves(root->left_exclude);
-    split_leaves(root->right_include);
     
     printf("\n\n~~~~~~~LAYER 2~~~~~~~\n");
     print_node(root->left_exclude->left_exclude);
@@ -185,7 +196,20 @@ void create_tree(FILE *fp) {
     print_node(root->right_include->left_exclude);
     print_node(root->right_include->right_include);
 
-    node_with_min_border = find_node_with_min_border(root);
-    printf("\n\n~~~~~~~node with min border~~~~~~~\n");
-    print_node(node_with_min_border);
+    printf("\n\n~~~~~~~LAYER 3~~~~~~~\n");
+    print_node(root->left_exclude->right_include->left_exclude);
+    print_node(root->left_exclude->right_include->right_include);
+
+    printf("\n\n~~~~~~~LAYER 4~~~~~~~\n");
+    print_node(root->left_exclude->right_include->right_include->left_exclude);
+    print_node(root->left_exclude->right_include->right_include->right_include);
+    
+    printf("\n\n~~~~~~~LAYER 5~~~~~~~\n");
+    print_node(root->left_exclude->right_include->right_include->right_include->left_exclude);
+    print_node(root->left_exclude->right_include->right_include->right_include->right_include);
+
+    // node_with_min_border = find_node_with_min_border(root);
+    // printf("\n\n~~~~~~~node with min border~~~~~~~\n");
+    // print_node(root->left_exclude->right_include->right_include);
+
 }
