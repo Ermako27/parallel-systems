@@ -291,10 +291,12 @@ void create_tree(FILE *fp) {
     Node* node_with_min_border;
     int is_one_element_left = 0;
 
-    // MPI_Init(NULL,NULL);
-	// int pid, num;
-	// MPI_Comm_rank(MPI_COMM_WORLD, &pid);
-	// MPI_Comm_size(MPI_COMM_WORLD, &num);
+    MPI_Init(NULL,NULL);
+	int pid, num;
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+	MPI_Comm_size(MPI_COMM_WORLD, &num);
+
+    printf("PROCESS № %d", pid);
 
     // считаем матрицу
     matrix = create_matrix(fp);
@@ -313,10 +315,11 @@ void create_tree(FILE *fp) {
         split_leaves(node_with_min_border);
         node_with_min_border = find_node_with_min_border(root);
         is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
-        printf("\n is_one_element_left: %d", is_one_element_left);
+        // printf("\n is_one_element_left: %d", is_one_element_left);
     }
 
     print_node(node_with_min_border);
+    MPI_Finalize();
 
 
     // if (pid == 0) {

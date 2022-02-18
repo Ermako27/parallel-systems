@@ -266,7 +266,7 @@ max_zero_estimate_t find_max_zero_estimate(matrix_t matrix) {
         }
     }
 
-    printf("\nestimate: %d, i: %d, j: %d", zero_estimate.value, zero_estimate.pos.i, zero_estimate.pos.j);
+    // printf("\nestimate: %d, i: %d, j: %d", zero_estimate.value, zero_estimate.pos.i, zero_estimate.pos.j);
     return zero_estimate;
 }
 
