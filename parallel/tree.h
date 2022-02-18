@@ -16,6 +16,6 @@ typedef struct Node {
 
 Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, Node* left, Node* right);
 
-void create_tree(FILE *fp);
+void create_tree();
 
 #endif

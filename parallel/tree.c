@@ -196,19 +196,29 @@ void calc_right_include_border(Node* node) {
 }
 
 // метод для создания ноды исключающей путь, найденный в estimate.pos в методе split_leaves
-void create_left_exclude(Node* parent) {
+Node* create_left_exclude(Node* parent) {
+    // Node* node;
+    // node = create_node(parent->matrix, 0, 0, parent, NULL, NULL);
+    // calc_left_exclude_border(node);
+    // parent->left_exclude = node;
+
     Node* node;
     node = create_node(parent->matrix, 0, 0, parent, NULL, NULL);
     calc_left_exclude_border(node);
-    parent->left_exclude = node;
+    return node;
 }
 
 // метод для создания ноды ключающей путь, найденный в estimate.pos в методе lit_leaves
-void create_right_include(Node* parent) {
+Node* create_right_include(Node* parent) {
+    // Node* node;
+    // node = create_node(parent->matrix, 0, 1, parent, NULL, NULL);
+    // calc_right_include_border(node);
+    // parent->right_include = node;
+
     Node* node;
     node = create_node(parent->matrix, 0, 1, parent, NULL, NULL);
     calc_right_include_border(node);
-    parent->right_include = node;
+    return node;
 }
 
 
@@ -221,14 +231,14 @@ void split_leaves(Node* node) {
         // родительской для нод, которые будут создаваться ниже
         estimate = find_max_zero_estimate(node->matrix);
         node->estimate = estimate;
-        // создаем левый лист - лист в котором путь не учитывается 
 
-        // arr = node_to_array(node);
-        // send(1, arr);
-        // send(2, arr);
+        int array_from_node_size;
+        int* array_from_node = node_to_array(node, &array_from_node_size);
+        MPI_Send(array_from_node, array_from_node_size, MPI_INT, LEFT_PID, 0, MPI_COMM_WORLD);
+        MPI_Send(array_from_node, array_from_node_size, MPI_INT, RIGHT_PID, 0, MPI_COMM_WORLD);
 
-        create_left_exclude(node);
-        create_right_include(node);
+        // create_left_exclude(node);
+        // create_right_include(node);
     } else {
         // 1 считаем редукцию строк матрицы в node
         reduced_rows_matrix_t reduced_rows_matrix;
@@ -248,12 +258,13 @@ void split_leaves(Node* node) {
         estimate = find_max_zero_estimate(node->matrix);
         node->estimate = estimate;
 
-        // arr = node_to_array(node);
-        // send(1, arr);
-        // send(2, arr);
+        int array_from_node_size;
+        int* array_from_node = node_to_array(node, &array_from_node_size);
+        MPI_Send(array_from_node, array_from_node_size, MPI_INT, LEFT_PID, 0, MPI_COMM_WORLD);
+        MPI_Send(array_from_node, array_from_node_size, MPI_INT, RIGHT_PID, 0, MPI_COMM_WORLD);
 
-        create_left_exclude(node);
-        create_right_include(node);
+        // create_left_exclude(node);
+        // create_right_include(node);
     }
 }
 
@@ -285,41 +296,213 @@ Node* find_node_with_min_border(Node* node) {
     }
 }
 
-void create_tree(FILE *fp) {
-    matrix_t matrix;
-    Node* root;
-    Node* node_with_min_border;
-    int is_one_element_left = 0;
-
+void create_tree() {
     MPI_Init(NULL,NULL);
 	int pid, num;
 	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
 	MPI_Comm_size(MPI_COMM_WORLD, &num);
 
-    printf("PROCESS № %d", pid);
+    if (pid == ROOT_PID) {
+        printf("process: %d\n", pid);
+        MPI_Status status;
+        int array_from_node_el_cnt;
 
-    // считаем матрицу
-    matrix = create_matrix(fp);
+        int idle_proc_count = PARALLEL_PROC_COUNT;
 
-    // создаем корень, считаем его границу и выставляем нужную матрицу
-    root = create_node(matrix, 0, 1, NULL, NULL, NULL);
-    calc_root_border(root);
+        FILE *fp;
+        char fileName[] = "test1.txt";
+        char ch;
+        fp = fopen(fileName, "r");
 
+        matrix_t matrix;
+        Node* root;
+        Node* node_with_min_border;
+        Node* node_from_array;
+        int is_one_element_left = 0;
 
+        // считаем матрицу
+        matrix = create_matrix(fp);
 
-    // чтобы начать цикл находим ноду с наименьшей границей (на данный момент это root) и проверяем кол-во элементов в ее матрице
-    node_with_min_border = find_node_with_min_border(root);
-    is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+        // создаем корень, считаем его границу и выставляем нужную матрицу
+        root = create_node(matrix, 0, 1, NULL, NULL, NULL);
+        calc_root_border(root);
 
-    while (is_one_element_left == 0) {
-        split_leaves(node_with_min_border);
+        // чтобы начать цикл находим ноду с наименьшей границей (на данный момент это root) и проверяем кол-во элементов в ее матрице
         node_with_min_border = find_node_with_min_border(root);
         is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
-        // printf("\n is_one_element_left: %d", is_one_element_left);
+
+        // пока не найдено решение
+        while (is_one_element_left == 0) {
+            // выполняем разделение ноды с минимальной границей
+            split_leaves(node_with_min_border);
+            // обнуляем кол-во свободных процессов так как оба сейчас заняты разделением
+            idle_proc_count = 0;
+            // printf("idle_proc_count: %d\n", idle_proc_count);
+
+            // ждем пока не освободятся оба процесса
+            while (idle_proc_count != 2) {
+                // получаем от двух других процессов массивы с данными новых нод
+                MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+                MPI_Get_count(&status, MPI_INT, &array_from_node_el_cnt);
+                int* array_from_node = malloc(array_from_node_el_cnt * sizeof(int));
+                MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+
+                // создаем ноду из массива
+                node_from_array = array_to_node(array_from_node);
+
+                // если это нода включает путь, то это правый потомок разделяемой на данном шаге ноды
+                if (node_from_array->is_included == 1) {
+                    node_with_min_border->right_include = node_from_array;
+                    node_from_array->parent = node_with_min_border;
+                } else { // иначе левый
+                    node_with_min_border->left_exclude = node_from_array;
+                    node_from_array->parent = node_with_min_border;
+                }
+
+                // увеличиваем кол-во свободных процессов
+                idle_proc_count++;
+                // printf("idle_proc_count: %d\n", idle_proc_count);
+            }
+
+            // когда вычислили и установили новые ноды, снова ищем лист с наименьшей границей и проверяем является ли он решением
+            node_with_min_border = find_node_with_min_border(root);
+            is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+        }
+
+        // когда решение найдено отправляем всем процессам сообщение о том что нужно остановить while(1)
+        int* end_array;
+        end_array[0] = -1;
+        MPI_Send(end_array, 1, MPI_INT, LEFT_PID, 0, MPI_COMM_WORLD);
+        MPI_Send(end_array, 1, MPI_INT, RIGHT_PID, 0, MPI_COMM_WORLD);
+
+        print_node(node_with_min_border);
+    } else if (pid == LEFT_PID) {
+        printf("process: %d\n", pid);
+        MPI_Status status;
+        int array_from_node_el_cnt;
+        Node* left_node, *parent_node_from_array;
+        int array_from_left_node_el_cnt;
+        int* array_from_left_node;
+
+        while (1) {
+            // получаем от root процесса массив с данными родительской ноды
+            MPI_Probe(0, 0, MPI_COMM_WORLD, &status);
+            MPI_Get_count(&status, MPI_INT, &array_from_node_el_cnt);
+
+            int* array_from_node = malloc(array_from_node_el_cnt * sizeof(int));
+            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+            // print_array(array_from_node, array_from_node_el_cnt);
+
+            if (array_from_node[0] == -1) {
+                break;
+            }
+
+            // создаем ноду из массива
+            parent_node_from_array = array_to_node(array_from_node);
+            
+            // создаем новую ноду, исключающую путь, вычисляем для нее все данные
+            left_node = create_left_exclude(parent_node_from_array);
+            // print_node(left_node);
+
+            // кастим новую ноду в массив
+            array_from_left_node = node_to_array(left_node, &array_from_left_node_el_cnt);
+
+            // print_array(array_from_left_node, array_from_node_el_cnt);
+
+            // отправляем этот массив root процессу
+            MPI_Send(array_from_left_node, array_from_left_node_el_cnt, MPI_INT, ROOT_PID, 0, MPI_COMM_WORLD);
+        }
+    } else if (pid == RIGHT_PID) {
+        printf("process: %d\n", pid);
+        MPI_Status status;
+        int array_from_node_el_cnt;
+        Node* right_node, *parent_node_from_array;
+        int array_from_right_node_el_cnt;
+        int* array_from_right_node;
+
+        while (1) {
+            // получаем от root процесса массив с данными родительской ноды
+            MPI_Probe(0, 0, MPI_COMM_WORLD, &status);
+            MPI_Get_count(&status, MPI_INT, &array_from_node_el_cnt);
+
+            int* array_from_node = malloc(array_from_node_el_cnt * sizeof(int));
+            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+
+            if (array_from_node[0] == -1) {
+                break;
+            }
+
+            // создаем ноду из массива
+            parent_node_from_array = array_to_node(array_from_node);
+            
+            // создаем новую ноду, исключающую путь, вычисляем для нее все данные
+            right_node = create_right_include(parent_node_from_array);
+
+            // кастим новую ноду в массив
+            array_from_right_node = node_to_array(right_node, &array_from_right_node_el_cnt);
+            
+            // print_array(array_from_right_node, array_from_right_node_el_cnt);
+
+            // отправляем этот массив root процессу
+            MPI_Send(array_from_right_node, array_from_right_node_el_cnt, MPI_INT, ROOT_PID, 0, MPI_COMM_WORLD);
+        }
     }
 
-    print_node(node_with_min_border);
     MPI_Finalize();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // // считаем матрицу
+    // matrix = create_matrix(fp);
+
+    // // создаем корень, считаем его границу и выставляем нужную матрицу
+    // root = create_node(matrix, 0, 1, NULL, NULL, NULL);
+    // calc_root_border(root);
+
+
+
+    // // чтобы начать цикл находим ноду с наименьшей границей (на данный момент это root) и проверяем кол-во элементов в ее матрице
+    // node_with_min_border = find_node_with_min_border(root);
+    // is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+
+    // while (is_one_element_left == 0) {
+    //     split_leaves(node_with_min_border);
+    //     node_with_min_border = find_node_with_min_border(root);
+    //     is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+    //     // printf("\n is_one_element_left: %d", is_one_element_left);
+    // }
+
+    // print_node(node_with_min_border);
+    MPI_Finalize();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // if (pid == 0) {

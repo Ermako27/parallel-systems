@@ -8,7 +8,6 @@ int main(void) {
     FILE *fp;
     char fileName[] = "test1.txt";
     char ch;
-    matrix_t matrix;
 
     fp = fopen(fileName, "r");
 
@@ -48,7 +47,7 @@ int main(void) {
     // printf("\n");
 
 
-    create_tree(fp);
+    create_tree();
 
     return 0;
 }

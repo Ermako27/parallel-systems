@@ -182,31 +182,33 @@ void create_tree(FILE *fp) {
         printf("\n is_one_element_left: %d", is_one_element_left);
     }
 
+    print_node(node_with_min_border);
 
-    printf("\n~~~~~~~LAYER 0~~~~~~~\n");
-    print_node(root);
 
-    printf("\n\n~~~~~~~LAYER 1~~~~~~~\n");
-    print_node(root->left_exclude);
-    print_node(root->right_include);
+    // printf("\n~~~~~~~LAYER 0~~~~~~~\n");
+    // print_node(root);
+
+    // printf("\n\n~~~~~~~LAYER 1~~~~~~~\n");
+    // print_node(root->left_exclude);
+    // print_node(root->right_include);
     
-    printf("\n\n~~~~~~~LAYER 2~~~~~~~\n");
-    print_node(root->left_exclude->left_exclude);
-    print_node(root->left_exclude->right_include);
-    print_node(root->right_include->left_exclude);
-    print_node(root->right_include->right_include);
+    // printf("\n\n~~~~~~~LAYER 2~~~~~~~\n");
+    // print_node(root->left_exclude->left_exclude);
+    // print_node(root->left_exclude->right_include);
+    // print_node(root->right_include->left_exclude);
+    // print_node(root->right_include->right_include);
 
-    printf("\n\n~~~~~~~LAYER 3~~~~~~~\n");
-    print_node(root->left_exclude->right_include->left_exclude);
-    print_node(root->left_exclude->right_include->right_include);
+    // printf("\n\n~~~~~~~LAYER 3~~~~~~~\n");
+    // print_node(root->left_exclude->right_include->left_exclude);
+    // print_node(root->left_exclude->right_include->right_include);
 
-    printf("\n\n~~~~~~~LAYER 4~~~~~~~\n");
-    print_node(root->left_exclude->right_include->right_include->left_exclude);
-    print_node(root->left_exclude->right_include->right_include->right_include);
+    // printf("\n\n~~~~~~~LAYER 4~~~~~~~\n");
+    // print_node(root->left_exclude->right_include->right_include->left_exclude);
+    // print_node(root->left_exclude->right_include->right_include->right_include);
     
-    printf("\n\n~~~~~~~LAYER 5~~~~~~~\n");
-    print_node(root->left_exclude->right_include->right_include->right_include->left_exclude);
-    print_node(root->left_exclude->right_include->right_include->right_include->right_include);
+    // printf("\n\n~~~~~~~LAYER 5~~~~~~~\n");
+    // print_node(root->left_exclude->right_include->right_include->right_include->left_exclude);
+    // print_node(root->left_exclude->right_include->right_include->right_include->right_include);
 
     // node_with_min_border = find_node_with_min_border(root);
     // printf("\n\n~~~~~~~node with min border~~~~~~~\n");
