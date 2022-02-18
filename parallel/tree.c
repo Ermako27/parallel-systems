@@ -46,13 +46,7 @@ Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, No
 int* node_to_array(Node* node, int* size) {
     int matrix_size_weight = 2; // в структуре matrix_size_t 2 элемента типа int;
     int matrix_el_cnt = node->matrix.size.n * node->matrix.size.m; // количество элементов в матрице
-    int matrix_el_weight = 3; // в структуре matrix_el_t 3 поля типа int
-    int total_matrix_weight = matrix_el_cnt * matrix_el_weight; // общее количество int которое занимает матрица
-    int matrix_start_in_arr_pos = 2;
-
-    int estimate_weight = 3; // в структуре max_zero_estimate_t 3 элемента типа int 
-    int border_weight = 1;
-    int is_included_weight = 1;
+    int total_matrix_weight = matrix_el_cnt * MATRIX_EL_WEIGHT; // общее количество int которое занимает матрица
 
     /**
      * [0-1] (size.n, size.m);
@@ -62,7 +56,7 @@ int* node_to_array(Node* node, int* size) {
      *      * el.end
      *      * el.weight
      */
-    int size_off_array =  matrix_size_weight + total_matrix_weight + estimate_weight + border_weight + is_included_weight;
+    int size_off_array =  MATRIX_SIZE_WEIGHT + total_matrix_weight + MATRIX_ESTIMATE_WEIGHT + MATRIX_BORDER_WEIGHT + MATRIX_IS_INCLUDED_WEIGHT;
     *size = size_off_array;
 
     int* arr_from_node = malloc(size_off_array*sizeof(int));
@@ -72,7 +66,7 @@ int* node_to_array(Node* node, int* size) {
     arr_from_node[1] = node->matrix.size.m;
 
     // кладем в массив все элементы матрицы
-    int step = MATRIX_START_POS;
+    int step = MATRIX_SIZE_WEIGHT;
     for (int i = 0; i < node->matrix.size.n; i++) {
         for (int j = 0; j < node->matrix.size.m; j++) {
             arr_from_node[step] = node->matrix.data[i][j].start;
@@ -84,20 +78,73 @@ int* node_to_array(Node* node, int* size) {
     }
 
     // кладем в массив estimate;
-    int estimate_start_pos = MATRIX_START_POS + total_matrix_weight;
+    int estimate_start_pos = MATRIX_SIZE_WEIGHT + total_matrix_weight;
     arr_from_node[estimate_start_pos] = node->estimate.pos.i;
     arr_from_node[estimate_start_pos + 1] = node->estimate.pos.j;
     arr_from_node[estimate_start_pos + 2] = node->estimate.value;
 
     // кладем в массив значение border
-    int border_pos = estimate_start_pos + 3;
+    int border_pos = estimate_start_pos + MATRIX_ESTIMATE_WEIGHT;
     arr_from_node[border_pos] = node->border;
 
     // кладем в массив значение 
-    int is_included_pos = border_pos + 1;
+    int is_included_pos = border_pos + MATRIX_BORDER_WEIGHT;
     arr_from_node[is_included_pos] = node->is_included;
 
     return arr_from_node;
+}
+
+Node* array_to_node(int* array) {
+    // достаем размеры матрицы
+    matrix_size_t size;
+    size.n = array[0];
+    size.m = array[1];
+
+    // достаем из массива саму матрицу
+    matrix_t matrix;
+
+    matrix_el_t** matrix_data;
+    matrix_data = allocate_matrix(size);
+    int row_step;
+
+    for (int i = 0; i < size.n; i++) {
+        row_step = MATRIX_SIZE_WEIGHT + i * size.m * MATRIX_EL_WEIGHT;
+        for (int j = 0; j < size.m; j++) {
+            matrix_data[i][j].start = array[j * MATRIX_EL_WEIGHT + row_step]; // 0 * 3 + 0 + 2 = 2 ; 1 * 3 + 0 + 2 = 5 ; 0 * 3 + 0 + 8 = 8 ; 1 * 3 + 0 + 8 = 11
+            matrix_data[i][j].end = array[j * MATRIX_EL_WEIGHT + 1 + row_step]; // 0 * 3 + 1 + 2 = 3 ; 1 * 3 + 1 + 2 = 6 ; 0 * 3 + 1 + 8 = 9 ; 1 * 3 + 1 + 8 = 12
+            matrix_data[i][j].weight = array[j * MATRIX_EL_WEIGHT + 2 + row_step]; // 0 * 3 + 2 + 2 = 4 ; 1 * 3 + 2 + 2 = 7 ; 0 * 3 + 2 + 8 = 10 ; 1 * 3 + 2 + 8 = 13
+        }
+    }
+    matrix.size = size;
+    matrix.data = matrix_data;
+
+
+    // достаем из массива estimate
+    max_zero_estimate_t estimate;
+    int matrix_el_cnt = size.n * size.m;
+    int total_matrix_weight = matrix_el_cnt * MATRIX_EL_WEIGHT; // общее количество int которое занимает матрица
+    int estimate_start_pos = MATRIX_SIZE_WEIGHT + total_matrix_weight;
+    estimate.pos.i = array[estimate_start_pos];
+    estimate.pos.j = array[estimate_start_pos + 1];
+    estimate.value = array[estimate_start_pos + 2];
+
+    // достаем из массива border
+    int border;
+    int border_pos = estimate_start_pos + MATRIX_ESTIMATE_WEIGHT;
+    border = array[border_pos];
+
+    // достаем из массива _included
+    int is_included;
+    int is_included_pos = border_pos + MATRIX_BORDER_WEIGHT;
+    is_included = array[is_included_pos];
+
+    // создаем саму ноду
+    Node* node = create_node(matrix,border,is_included,NULL,NULL,NULL);
+    node->estimate.pos.i = estimate.pos.i;
+    node->estimate.pos.j = estimate.pos.j;
+    node->estimate.value = estimate.value;
+
+    return node;
 }
 
 void calc_root_border(Node *root) {
@@ -175,6 +222,11 @@ void split_leaves(Node* node) {
         estimate = find_max_zero_estimate(node->matrix);
         node->estimate = estimate;
         // создаем левый лист - лист в котором путь не учитывается 
+
+        // arr = node_to_array(node);
+        // send(1, arr);
+        // send(2, arr);
+
         create_left_exclude(node);
         create_right_include(node);
     } else {
@@ -195,6 +247,10 @@ void split_leaves(Node* node) {
         // родительской для нод, которые будут создаваться ниже
         estimate = find_max_zero_estimate(node->matrix);
         node->estimate = estimate;
+
+        // arr = node_to_array(node);
+        // send(1, arr);
+        // send(2, arr);
 
         create_left_exclude(node);
         create_right_include(node);
@@ -234,6 +290,7 @@ void create_tree(FILE *fp) {
     Node* root;
     Node* node_with_min_border;
     int is_one_element_left = 0;
+
     // MPI_Init(NULL,NULL);
 	// int pid, num;
 	// MPI_Comm_rank(MPI_COMM_WORLD, &pid);
@@ -243,24 +300,139 @@ void create_tree(FILE *fp) {
     matrix = create_matrix(fp);
 
     // создаем корень, считаем его границу и выставляем нужную матрицу
-    root = create_node(matrix, 777, 1, NULL, NULL, NULL);
-    // calc_root_border(root);
+    root = create_node(matrix, 0, 1, NULL, NULL, NULL);
+    calc_root_border(root);
 
-    int size;
-    int* array_from_node = node_to_array(root, &size);
-    printf("size: %d\n", size);
-    print_array(array_from_node, size);
 
-    // // чтобы начать цикл находим ноду с наименьшей границей (на данный момент это root) и проверяем кол-во элементов в ее матрице
-    // node_with_min_border = find_node_with_min_border(root);
-    // is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
 
-    // while (is_one_element_left == 0) {
-    //     split_leaves(node_with_min_border);
-    //     node_with_min_border = find_node_with_min_border(root);
-    //     is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
-    //     printf("\n is_one_element_left: %d", is_one_element_left);
+    // чтобы начать цикл находим ноду с наименьшей границей (на данный момент это root) и проверяем кол-во элементов в ее матрице
+    node_with_min_border = find_node_with_min_border(root);
+    is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+
+    while (is_one_element_left == 0) {
+        split_leaves(node_with_min_border);
+        node_with_min_border = find_node_with_min_border(root);
+        is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+        printf("\n is_one_element_left: %d", is_one_element_left);
+    }
+
+    print_node(node_with_min_border);
+
+
+    // if (pid == 0) {
+    //     while (is_one_element_left == 0) {
+    //         split_leaves(node_with_min_border);
+
+    //         while (cnt_of_idle_proc != 2) {
+    //             recv(from_any)
+    //             node = array_to_node()
+    //             if (node.is_included) {
+    //                 node_with_min_border.right = node;
+    //             } else {
+    //                 node_with_min_border.left = node;
+    //             }
+    //             cnt_of_idle_proc++;
+    //         }
+
+    //         node_with_min_border = find_node_with_min_border(root);
+    //         is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+    //         printf("\n is_one_element_left: %d", is_one_element_left);
+    //     }
+    // } else if (pid == 1) {
+    //     while (1) {
+    //         recv()
+
+    //         if (размер переданного массива == 1) {
+    //             break
+    //         } else {
+    //             parent_node = array_to_node()
+    //             left_node = create_left_exclude(parent_node)
+    //             result_arr = node_to_array(left_node)
+    //             send(result_arr);
+    //         }
+    //     }
+
+    // } else if (pid == 2) {
+    //     while (1) {
+    //         recv()
+
+    //         if (размер переданного массива == 1) {
+    //             break
+    //         } else {
+    //             parent_node = array_to_node()
+    //             right_node = create_right_include(parent_node)
+    //             result_arr = node_to_array(right_node)
+    //             send(result_arr);
+    //         }
+    //     }
     // }
+}
+
+
+
+
+
+
+
+    // print_node(root);
+    // print_matrix_ways(root->matrix);
+    // int size;
+    // int* array_from_node = node_to_array(root, &size);
+    // print_array(array_from_node, size);
+
+    // Node* new_node;
+    // new_node = array_to_node(array_from_node);
+    // print_node(new_node);
+    // print_matrix_ways(new_node->matrix);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // printf("\n~~~~~~~LAYER 0~~~~~~~\n");
@@ -293,5 +465,3 @@ void create_tree(FILE *fp) {
     // node_with_min_border = find_node_with_min_border(root);
     // printf("\n\n~~~~~~~node with min border~~~~~~~\n");
     // print_node(root->left_exclude->right_include->right_include);
-
-}
