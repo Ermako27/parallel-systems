@@ -285,9 +285,12 @@ void create_tree() {
 	int pid, num;
 	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
 	MPI_Comm_size(MPI_COMM_WORLD, &num);
+    // char *proc_name;
+    // int proc_name_len;
+    // MPI_Get_processor_name(proc_name, &proc_name_len);
+    double start_time, end_time;
 
     if (pid == ROOT_PID) {
-        printf("process: %d\n", pid);
         MPI_Status status;
         int array_from_node_el_cnt;
 
@@ -304,6 +307,10 @@ void create_tree() {
         Node* node_from_array;
         int is_one_element_left = 0;
 
+        printf("\n-------PROGRAMM INFO-------\n");
+        printf("pid: %d\n", pid);
+        printf("count of procs: %d\n\n", num);
+
         // считаем матрицу
         matrix = create_matrix(fp);
 
@@ -314,6 +321,8 @@ void create_tree() {
         // чтобы начать цикл находим ноду с наименьшей границей (на данный момент это root) и проверяем кол-во элементов в ее матрице
         node_with_min_border = find_node_with_min_border(root);
         is_one_element_left = is_one_element_matrix(node_with_min_border->matrix);
+
+        start_time = MPI_Wtime();
 
         // пока не найдено решение
         while (is_one_element_left == 0) {
@@ -358,8 +367,11 @@ void create_tree() {
         MPI_Send(end_array, 1, MPI_INT, RIGHT_PID, 0, MPI_COMM_WORLD);
 
         print_node(node_with_min_border);
+
+        end_time = MPI_Wtime();
+        printf("\npid %d, time: %lf\n", pid, end_time - start_time);
     } else if (pid == LEFT_PID) {
-        printf("process: %d\n", pid);
+        // printf("process: %d\n", pid);
         MPI_Status status;
         int array_from_node_el_cnt;
         Node* left_node, *parent_node_from_array;
@@ -391,7 +403,7 @@ void create_tree() {
             MPI_Send(array_from_left_node, array_from_left_node_el_cnt, MPI_INT, ROOT_PID, 0, MPI_COMM_WORLD);
         }
     } else if (pid == RIGHT_PID) {
-        printf("process: %d\n", pid);
+        // printf("process: %d\n", pid);
         MPI_Status status;
         int array_from_node_el_cnt;
         Node* right_node, *parent_node_from_array;

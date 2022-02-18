@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "matrix.h"
 #include "tree.h"
+#include "mpi.h"
+
 
 void print_node(Node* node) {
     printf("\n--------NODE-------\n");
@@ -164,6 +166,17 @@ void create_tree(FILE *fp) {
     Node* node_with_min_border;
     int is_one_element_left = 0;
 
+    MPI_Init(NULL,NULL);
+	int pid, num;
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+	MPI_Comm_size(MPI_COMM_WORLD, &num);
+    double start_time, end_time;
+    
+    start_time = MPI_Wtime();
+
+    printf("\n-------PROGRAMM INFO-------\n");
+    printf("pid: %d\n", pid);
+    printf("count of procs: %d\n\n", num);
     // считаем матрицу
     matrix = create_matrix(fp);
 
@@ -185,33 +198,36 @@ void create_tree(FILE *fp) {
     print_node(node_with_min_border);
 
 
-    // printf("\n~~~~~~~LAYER 0~~~~~~~\n");
-    // print_node(root);
+    printf("\n~~~~~~~LAYER 0~~~~~~~\n");
+    print_node(root);
 
-    // printf("\n\n~~~~~~~LAYER 1~~~~~~~\n");
-    // print_node(root->left_exclude);
-    // print_node(root->right_include);
+    printf("\n\n~~~~~~~LAYER 1~~~~~~~\n");
+    print_node(root->left_exclude);
+    print_node(root->right_include);
     
-    // printf("\n\n~~~~~~~LAYER 2~~~~~~~\n");
-    // print_node(root->left_exclude->left_exclude);
-    // print_node(root->left_exclude->right_include);
-    // print_node(root->right_include->left_exclude);
-    // print_node(root->right_include->right_include);
+    printf("\n\n~~~~~~~LAYER 2~~~~~~~\n");
+    print_node(root->left_exclude->left_exclude);
+    print_node(root->left_exclude->right_include);
+    print_node(root->right_include->left_exclude);
+    print_node(root->right_include->right_include);
 
-    // printf("\n\n~~~~~~~LAYER 3~~~~~~~\n");
-    // print_node(root->left_exclude->right_include->left_exclude);
-    // print_node(root->left_exclude->right_include->right_include);
+    printf("\n\n~~~~~~~LAYER 3~~~~~~~\n");
+    print_node(root->left_exclude->right_include->left_exclude);
+    print_node(root->left_exclude->right_include->right_include);
 
-    // printf("\n\n~~~~~~~LAYER 4~~~~~~~\n");
-    // print_node(root->left_exclude->right_include->right_include->left_exclude);
-    // print_node(root->left_exclude->right_include->right_include->right_include);
+    printf("\n\n~~~~~~~LAYER 4~~~~~~~\n");
+    print_node(root->left_exclude->right_include->right_include->left_exclude);
+    print_node(root->left_exclude->right_include->right_include->right_include);
     
-    // printf("\n\n~~~~~~~LAYER 5~~~~~~~\n");
-    // print_node(root->left_exclude->right_include->right_include->right_include->left_exclude);
-    // print_node(root->left_exclude->right_include->right_include->right_include->right_include);
+    printf("\n\n~~~~~~~LAYER 5~~~~~~~\n");
+    print_node(root->left_exclude->right_include->right_include->right_include->left_exclude);
+    print_node(root->left_exclude->right_include->right_include->right_include->right_include);
 
-    // node_with_min_border = find_node_with_min_border(root);
-    // printf("\n\n~~~~~~~node with min border~~~~~~~\n");
-    // print_node(root->left_exclude->right_include->right_include);
+    node_with_min_border = find_node_with_min_border(root);
+    printf("\n\n~~~~~~~node with min border~~~~~~~\n");
+    print_node(root->left_exclude->right_include->right_include);
+
+    end_time = MPI_Wtime();
+    printf("\npid %d, time: %lf\n", pid, end_time - start_time);
 
 }
