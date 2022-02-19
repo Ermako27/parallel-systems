@@ -19,4 +19,4 @@
 # Чтобы srun заработал impi
 ### export I_MPI_PMI_LIBRARY=/usr/lib64/libmpi.so
 
-mpirun -np 10 lu.out
+mpirun -n 3 ./a.out
