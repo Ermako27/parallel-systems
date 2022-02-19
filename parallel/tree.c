@@ -361,7 +361,7 @@ void create_tree() {
         }
 
         // когда решение найдено отправляем всем процессам сообщение о том что нужно остановить while(1)
-        short* end_array;
+        short* end_array = malloc(1*sizeof(short));
         end_array[0] = -1;
         MPI_Send(end_array, 1, MPI_SHORT, LEFT_PID, 0, MPI_COMM_WORLD);
         MPI_Send(end_array, 1, MPI_SHORT, RIGHT_PID, 0, MPI_COMM_WORLD);
