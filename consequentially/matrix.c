@@ -266,7 +266,7 @@ max_zero_estimate_t find_max_zero_estimate(matrix_t matrix) {
         }
     }
 
-    printf("\nestimate: %d, i: %d, j: %d", zero_estimate.value, zero_estimate.pos.i, zero_estimate.pos.j);
+    // printf("\nestimate: %d, i: %d, j: %d", zero_estimate.value, zero_estimate.pos.i, zero_estimate.pos.j);
     return zero_estimate;
 }
 
@@ -313,7 +313,7 @@ matrix_t reduce_matrix(matrix_t matrix, pos_t pos) {
 
     // при удалении строки и столбца из матрицы ставим на обратный путь значек INF
     way_back_position = find_way_back(matrix, pos);
-    printf("\n way_back_position: i: %d, j: %d", way_back_position.i, way_back_position.j);
+    // printf("\n way_back_position: i: %d, j: %d", way_back_position.i, way_back_position.j);
 
     if (way_back_position.i != -1 && way_back_position.j != -1) {
         matrix.data[way_back_position.i][way_back_position.j].weight = INF;

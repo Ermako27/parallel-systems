@@ -6,7 +6,7 @@
 
 int main(void) {
     FILE *fp;
-    char fileName[] = "test1.txt";
+    char fileName[] = "test3.txt";
     char ch;
     matrix_t matrix;
 
