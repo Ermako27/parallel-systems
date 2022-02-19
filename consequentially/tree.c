@@ -230,4 +230,5 @@ void create_tree(FILE *fp) {
     end_time = MPI_Wtime();
     printf("\npid %d, time: %lf\n", pid, end_time - start_time);
 
+    MPI_Finalize();
 }

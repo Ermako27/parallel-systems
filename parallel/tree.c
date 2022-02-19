@@ -297,7 +297,7 @@ void create_tree() {
         short idle_proc_count = PARALLEL_PROC_COUNT;
 
         FILE *fp;
-        char fileName[] = "test1.txt";
+        char fileName[] = "test3.txt";
         char ch;
         fp = fopen(fileName, "r");
 
