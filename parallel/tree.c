@@ -17,17 +17,17 @@ void print_node(Node* node) {
     printf("\n-----END NODE------\n");
 }
 
-void print_array(int* array, int n) {
+void print_array(short* array, short n) {
     printf("\n----- Array -----\n");
 
-    for (int i = 0; i < n; i++) {
+    for (short i = 0; i < n; i++) {
         printf("\n %d", array[i]);
     }
 
     printf("\n----- End Array -----\n");
 }
 
-Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, Node* left, Node* right) {
+Node* create_node(matrix_t matrix, short border, short is_included, Node* parent, Node* left, Node* right) {
     Node* node = (Node*) malloc(sizeof(Node));
     node->matrix = copy_matrix(matrix);
     node->estimate.pos.i = -1;
@@ -43,10 +43,10 @@ Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, No
     return node;
 }
 
-int* node_to_array(Node* node, int* size) {
-    int matrix_size_weight = 2; // в структуре matrix_size_t 2 элемента типа int;
-    int matrix_el_cnt = node->matrix.size.n * node->matrix.size.m; // количество элементов в матрице
-    int total_matrix_weight = matrix_el_cnt * MATRIX_EL_WEIGHT; // общее количество int которое занимает матрица
+short* node_to_array(Node* node, short* size) {
+    short matrix_size_weight = 2; // в структуре matrix_size_t 2 элемента типа short;
+    short matrix_el_cnt = node->matrix.size.n * node->matrix.size.m; // количество элементов в матрице
+    short total_matrix_weight = matrix_el_cnt * MATRIX_EL_WEIGHT; // общее количество short которое занимает матрица
 
     /**
      * [0-1] (size.n, size.m);
@@ -56,19 +56,19 @@ int* node_to_array(Node* node, int* size) {
      *      * el.end
      *      * el.weight
      */
-    int size_off_array =  MATRIX_SIZE_WEIGHT + total_matrix_weight + MATRIX_ESTIMATE_WEIGHT + MATRIX_BORDER_WEIGHT + MATRIX_IS_INCLUDED_WEIGHT;
+    short size_off_array =  MATRIX_SIZE_WEIGHT + total_matrix_weight + MATRIX_ESTIMATE_WEIGHT + MATRIX_BORDER_WEIGHT + MATRIX_IS_INCLUDED_WEIGHT;
     *size = size_off_array;
 
-    int* arr_from_node = malloc(size_off_array*sizeof(int));
+    short* arr_from_node = malloc(size_off_array*sizeof(short));
 
     // кладем в массив размеры матрицы
     arr_from_node[0] = node->matrix.size.n;
     arr_from_node[1] = node->matrix.size.m;
 
     // кладем в массив все элементы матрицы
-    int step = MATRIX_SIZE_WEIGHT;
-    for (int i = 0; i < node->matrix.size.n; i++) {
-        for (int j = 0; j < node->matrix.size.m; j++) {
+    short step = MATRIX_SIZE_WEIGHT;
+    for (short i = 0; i < node->matrix.size.n; i++) {
+        for (short j = 0; j < node->matrix.size.m; j++) {
             arr_from_node[step] = node->matrix.data[i][j].start;
             arr_from_node[step + 1] = node->matrix.data[i][j].end;
             arr_from_node[step + 2] = node->matrix.data[i][j].weight;
@@ -78,23 +78,23 @@ int* node_to_array(Node* node, int* size) {
     }
 
     // кладем в массив estimate;
-    int estimate_start_pos = MATRIX_SIZE_WEIGHT + total_matrix_weight;
+    short estimate_start_pos = MATRIX_SIZE_WEIGHT + total_matrix_weight;
     arr_from_node[estimate_start_pos] = node->estimate.pos.i;
     arr_from_node[estimate_start_pos + 1] = node->estimate.pos.j;
     arr_from_node[estimate_start_pos + 2] = node->estimate.value;
 
     // кладем в массив значение border
-    int border_pos = estimate_start_pos + MATRIX_ESTIMATE_WEIGHT;
+    short border_pos = estimate_start_pos + MATRIX_ESTIMATE_WEIGHT;
     arr_from_node[border_pos] = node->border;
 
     // кладем в массив значение 
-    int is_included_pos = border_pos + MATRIX_BORDER_WEIGHT;
+    short is_included_pos = border_pos + MATRIX_BORDER_WEIGHT;
     arr_from_node[is_included_pos] = node->is_included;
 
     return arr_from_node;
 }
 
-Node* array_to_node(int* array) {
+Node* array_to_node(short* array) {
     // достаем размеры матрицы
     matrix_size_t size;
     size.n = array[0];
@@ -105,11 +105,11 @@ Node* array_to_node(int* array) {
 
     matrix_el_t** matrix_data;
     matrix_data = allocate_matrix(size);
-    int row_step;
+    short row_step;
 
-    for (int i = 0; i < size.n; i++) {
+    for (short i = 0; i < size.n; i++) {
         row_step = MATRIX_SIZE_WEIGHT + i * size.m * MATRIX_EL_WEIGHT;
-        for (int j = 0; j < size.m; j++) {
+        for (short j = 0; j < size.m; j++) {
             matrix_data[i][j].start = array[j * MATRIX_EL_WEIGHT + row_step]; // 0 * 3 + 0 + 2 = 2 ; 1 * 3 + 0 + 2 = 5 ; 0 * 3 + 0 + 8 = 8 ; 1 * 3 + 0 + 8 = 11
             matrix_data[i][j].end = array[j * MATRIX_EL_WEIGHT + 1 + row_step]; // 0 * 3 + 1 + 2 = 3 ; 1 * 3 + 1 + 2 = 6 ; 0 * 3 + 1 + 8 = 9 ; 1 * 3 + 1 + 8 = 12
             matrix_data[i][j].weight = array[j * MATRIX_EL_WEIGHT + 2 + row_step]; // 0 * 3 + 2 + 2 = 4 ; 1 * 3 + 2 + 2 = 7 ; 0 * 3 + 2 + 8 = 10 ; 1 * 3 + 2 + 8 = 13
@@ -121,21 +121,21 @@ Node* array_to_node(int* array) {
 
     // достаем из массива estimate
     max_zero_estimate_t estimate;
-    int matrix_el_cnt = size.n * size.m;
-    int total_matrix_weight = matrix_el_cnt * MATRIX_EL_WEIGHT; // общее количество int которое занимает матрица
-    int estimate_start_pos = MATRIX_SIZE_WEIGHT + total_matrix_weight;
+    short matrix_el_cnt = size.n * size.m;
+    short total_matrix_weight = matrix_el_cnt * MATRIX_EL_WEIGHT; // общее количество short которое занимает матрица
+    short estimate_start_pos = MATRIX_SIZE_WEIGHT + total_matrix_weight;
     estimate.pos.i = array[estimate_start_pos];
     estimate.pos.j = array[estimate_start_pos + 1];
     estimate.value = array[estimate_start_pos + 2];
 
     // достаем из массива border
-    int border;
-    int border_pos = estimate_start_pos + MATRIX_ESTIMATE_WEIGHT;
+    short border;
+    short border_pos = estimate_start_pos + MATRIX_ESTIMATE_WEIGHT;
     border = array[border_pos];
 
     // достаем из массива _included
-    int is_included;
-    int is_included_pos = border_pos + MATRIX_BORDER_WEIGHT;
+    short is_included;
+    short is_included_pos = border_pos + MATRIX_BORDER_WEIGHT;
     is_included = array[is_included_pos];
 
     // создаем саму ноду
@@ -148,7 +148,7 @@ Node* array_to_node(int* array) {
 }
 
 void calc_root_border(Node *root) {
-    int border; 
+    short border; 
     reduced_rows_matrix_t reduced_rows_matrix;
     reduced_rows_matrix = reduce_rows(root->matrix);
 
@@ -162,7 +162,7 @@ void calc_root_border(Node *root) {
 }
 
 void calc_left_exclude_border(Node* node) {
-    int i, j;
+    short i, j;
     i = node->parent->estimate.pos.i;
     j = node->parent->estimate.pos.j;
 
@@ -176,7 +176,7 @@ void calc_right_include_border(Node* node) {
     matrix_t reduced_matrix;
     reduced_rows_matrix_t reduced_rows_matrix;
     reduced_cols_matrix_t reduced_columns_matrix;
-    int border;
+    short border;
 
     // проводим редукцию матрицы
     reduced_matrix = reduce_matrix(node->matrix, node->parent->estimate.pos);
@@ -222,10 +222,10 @@ void split_leaves(Node* node) {
         estimate = find_max_zero_estimate(node->matrix);
         node->estimate = estimate;
 
-        int array_from_node_size;
-        int* array_from_node = node_to_array(node, &array_from_node_size);
-        MPI_Send(array_from_node, array_from_node_size, MPI_INT, LEFT_PID, 0, MPI_COMM_WORLD);
-        MPI_Send(array_from_node, array_from_node_size, MPI_INT, RIGHT_PID, 0, MPI_COMM_WORLD);
+        short array_from_node_size;
+        short* array_from_node = node_to_array(node, &array_from_node_size);
+        MPI_Send(array_from_node, array_from_node_size, MPI_SHORT, LEFT_PID, 0, MPI_COMM_WORLD);
+        MPI_Send(array_from_node, array_from_node_size, MPI_SHORT, RIGHT_PID, 0, MPI_COMM_WORLD);
     } else {
         // 1 считаем редукцию строк матрицы в node
         reduced_rows_matrix_t reduced_rows_matrix;
@@ -245,14 +245,14 @@ void split_leaves(Node* node) {
         estimate = find_max_zero_estimate(node->matrix);
         node->estimate = estimate;
 
-        int array_from_node_size;
-        int* array_from_node = node_to_array(node, &array_from_node_size);
-        MPI_Send(array_from_node, array_from_node_size, MPI_INT, LEFT_PID, 0, MPI_COMM_WORLD);
-        MPI_Send(array_from_node, array_from_node_size, MPI_INT, RIGHT_PID, 0, MPI_COMM_WORLD);
+        short array_from_node_size;
+        short* array_from_node = node_to_array(node, &array_from_node_size);
+        MPI_Send(array_from_node, array_from_node_size, MPI_SHORT, LEFT_PID, 0, MPI_COMM_WORLD);
+        MPI_Send(array_from_node, array_from_node_size, MPI_SHORT, RIGHT_PID, 0, MPI_COMM_WORLD);
     }
 }
 
-int is_leaf(Node* node) {
+short is_leaf(Node* node) {
     if (node->left_exclude == NULL && node->right_include == NULL) {
         return 1;
     } else {
@@ -263,7 +263,7 @@ int is_leaf(Node* node) {
 Node* find_node_with_min_border(Node* node) {
     Node* left_node;
     Node* right_node;
-    int is_node_leaf;
+    short is_node_leaf;
     is_node_leaf = is_leaf(node);
 
     if (is_node_leaf == 1) {
@@ -286,7 +286,7 @@ void create_tree() {
 	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
 	MPI_Comm_size(MPI_COMM_WORLD, &num);
     // char *proc_name;
-    // int proc_name_len;
+    // short proc_name_len;
     // MPI_Get_processor_name(proc_name, &proc_name_len);
     double start_time, end_time;
 
@@ -294,7 +294,7 @@ void create_tree() {
         MPI_Status status;
         int array_from_node_el_cnt;
 
-        int idle_proc_count = PARALLEL_PROC_COUNT;
+        short idle_proc_count = PARALLEL_PROC_COUNT;
 
         FILE *fp;
         char fileName[] = "test1.txt";
@@ -305,7 +305,7 @@ void create_tree() {
         Node* root;
         Node* node_with_min_border;
         Node* node_from_array;
-        int is_one_element_left = 0;
+        short is_one_element_left = 0;
 
         printf("\n-------PROGRAMM INFO-------\n");
         printf("pid: %d\n", pid);
@@ -335,9 +335,9 @@ void create_tree() {
             while (idle_proc_count != 2) {
                 // получаем от двух других процессов массивы с данными новых нод
                 MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-                MPI_Get_count(&status, MPI_INT, &array_from_node_el_cnt);
-                int* array_from_node = malloc(array_from_node_el_cnt * sizeof(int));
-                MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+                MPI_Get_count(&status, MPI_SHORT, &array_from_node_el_cnt);
+                short* array_from_node = malloc(array_from_node_el_cnt * sizeof(short));
+                MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 
                 // создаем ноду из массива
                 node_from_array = array_to_node(array_from_node);
@@ -361,10 +361,10 @@ void create_tree() {
         }
 
         // когда решение найдено отправляем всем процессам сообщение о том что нужно остановить while(1)
-        int* end_array;
+        short* end_array;
         end_array[0] = -1;
-        MPI_Send(end_array, 1, MPI_INT, LEFT_PID, 0, MPI_COMM_WORLD);
-        MPI_Send(end_array, 1, MPI_INT, RIGHT_PID, 0, MPI_COMM_WORLD);
+        MPI_Send(end_array, 1, MPI_SHORT, LEFT_PID, 0, MPI_COMM_WORLD);
+        MPI_Send(end_array, 1, MPI_SHORT, RIGHT_PID, 0, MPI_COMM_WORLD);
 
         print_node(node_with_min_border);
 
@@ -375,16 +375,16 @@ void create_tree() {
         MPI_Status status;
         int array_from_node_el_cnt;
         Node* left_node, *parent_node_from_array;
-        int array_from_left_node_el_cnt;
-        int* array_from_left_node;
+        short array_from_left_node_el_cnt;
+        short* array_from_left_node;
 
         while (1) {
             // получаем от root процесса массив с данными родительской ноды
             MPI_Probe(0, 0, MPI_COMM_WORLD, &status);
-            MPI_Get_count(&status, MPI_INT, &array_from_node_el_cnt);
+            MPI_Get_count(&status, MPI_SHORT, &array_from_node_el_cnt);
 
-            int* array_from_node = malloc(array_from_node_el_cnt * sizeof(int));
-            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+            short* array_from_node = malloc(array_from_node_el_cnt * sizeof(short));
+            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 
             if (array_from_node[0] == -1) {
                 break;
@@ -400,23 +400,23 @@ void create_tree() {
             array_from_left_node = node_to_array(left_node, &array_from_left_node_el_cnt);
 
             // отправляем этот массив root процессу
-            MPI_Send(array_from_left_node, array_from_left_node_el_cnt, MPI_INT, ROOT_PID, 0, MPI_COMM_WORLD);
+            MPI_Send(array_from_left_node, array_from_left_node_el_cnt, MPI_SHORT, ROOT_PID, 0, MPI_COMM_WORLD);
         }
     } else if (pid == RIGHT_PID) {
         // printf("process: %d\n", pid);
         MPI_Status status;
         int array_from_node_el_cnt;
         Node* right_node, *parent_node_from_array;
-        int array_from_right_node_el_cnt;
-        int* array_from_right_node;
+        short array_from_right_node_el_cnt;
+        short* array_from_right_node;
 
         while (1) {
             // получаем от root процесса массив с данными родительской ноды
             MPI_Probe(0, 0, MPI_COMM_WORLD, &status);
-            MPI_Get_count(&status, MPI_INT, &array_from_node_el_cnt);
+            MPI_Get_count(&status, MPI_SHORT, &array_from_node_el_cnt);
 
-            int* array_from_node = malloc(array_from_node_el_cnt * sizeof(int));
-            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+            short* array_from_node = malloc(array_from_node_el_cnt * sizeof(short));
+            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 
             if (array_from_node[0] == -1) {
                 break;
@@ -432,7 +432,7 @@ void create_tree() {
             array_from_right_node = node_to_array(right_node, &array_from_right_node_el_cnt);
 
             // отправляем этот массив root процессу
-            MPI_Send(array_from_right_node, array_from_right_node_el_cnt, MPI_INT, ROOT_PID, 0, MPI_COMM_WORLD);
+            MPI_Send(array_from_right_node, array_from_right_node_el_cnt, MPI_SHORT, ROOT_PID, 0, MPI_COMM_WORLD);
         }
     }
 

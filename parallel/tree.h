@@ -7,14 +7,14 @@
 typedef struct Node {
     matrix_t matrix;
     max_zero_estimate_t estimate;
-    int border;
-    int is_included;
+    short border;
+    short is_included;
     struct Node *right_include;
     struct Node *left_exclude;
     struct Node *parent;
 } Node;
 
-Node* create_node(matrix_t matrix, int border, int is_included, Node* parent, Node* left, Node* right);
+Node* create_node(matrix_t matrix, short border, short is_included, Node* parent, Node* left, Node* right);
 
 void create_tree();
 
