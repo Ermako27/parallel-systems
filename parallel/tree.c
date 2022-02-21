@@ -337,7 +337,13 @@ void create_tree() {
                 MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
                 MPI_Get_count(&status, MPI_SHORT, &array_from_node_el_cnt);
                 short* array_from_node = malloc(array_from_node_el_cnt * sizeof(short));
-                MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+                MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, status.MPI_SOURCE, 0, MPI_COMM_WORLD, &status);
+
+                printf("\n------------------\n");
+                printf("MPI process pid: %d\n", pid);
+                printf("len of array: %d\n", array_from_node_el_cnt);
+                printf("messge recieved from pid: %d\n", status.MPI_SOURCE);
+                printf("------------------\n\n");
 
                 // создаем ноду из массива
                 node_from_array = array_to_node(array_from_node);
@@ -384,7 +390,13 @@ void create_tree() {
             MPI_Get_count(&status, MPI_SHORT, &array_from_node_el_cnt);
 
             short* array_from_node = malloc(array_from_node_el_cnt * sizeof(short));
-            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, ROOT_PID, 0, MPI_COMM_WORLD, &status);
+
+            printf("\n------------------\n");
+            printf("MPI process pid: %d\n", pid);
+            printf("len of array: %d\n", array_from_node_el_cnt);
+            printf("messge recieved from pid: %d\n", status.MPI_SOURCE);
+            printf("------------------\n\n");
 
             if (array_from_node[0] == -1) {
                 break;
@@ -416,7 +428,13 @@ void create_tree() {
             MPI_Get_count(&status, MPI_SHORT, &array_from_node_el_cnt);
 
             short* array_from_node = malloc(array_from_node_el_cnt * sizeof(short));
-            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+            MPI_Recv(array_from_node, array_from_node_el_cnt, MPI_SHORT, ROOT_PID, 0, MPI_COMM_WORLD, &status);
+            
+            printf("\n------------------\n");
+            printf("MPI process pid: %d\n", pid);
+            printf("len of array: %d\n", array_from_node_el_cnt);
+            printf("messge recieved from pid: %d\n", status.MPI_SOURCE);
+            printf("------------------\n\n");
 
             if (array_from_node[0] == -1) {
                 break;
